@@ -1,0 +1,78 @@
+﻿@page "/"
+@using NewsAggregator.Data
+@using Microsoft.Data.Sqlite
+
+<PageTitle>Новости</PageTitle>
+
+<h1>Агрегатор новостей</h1>
+
+На этом сайте можно следить за последними новостями!
+<p>//</p>
+<p>Информация о выводе: @text</p>
+<p>//</p>
+<div class="container">
+    <div class="text-left my-1">
+        <ul class="list-group">
+            @foreach (NewsCard card in cards)
+            {
+                    <li class="list-group-item">
+                        <h5><a href="@card.Link" target="_blank">@card.Title</a></h5>
+                        <p>Description: @card.Description</p>
+                        <p>Source: @card.Source</p>
+                        <p>Publish date: @card.Date.ToString("dd-MM-yyyy hh:mm")</p>
+                    </li>
+            }
+        </ul>
+    </div>
+</div>
+
+@code {
+    List<Source> sources = new List<Source>();
+    List<NewsCard> cards = new List<NewsCard>();
+    string text = "";
+
+    public void GetSources()
+    {
+        sources.Clear();
+        using (var connection = new SqliteConnection("Data Source=sourcesdata.db"))
+        {
+            connection.Open();
+
+            string sqlExpression = "SELECT * FROM Sources";
+            SqliteCommand command = new SqliteCommand(sqlExpression, connection);
+            using (SqliteDataReader reader = command.ExecuteReader())
+            {
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        string title = reader.GetString(1);
+                        bool isPicked = reader.GetInt32(2) == 1 ? true : false;
+                        string link = reader.GetString(3);
+
+                        sources.Add(new Source(title, isPicked, link));
+                    }
+                }
+            }
+
+            connection.Close();
+        }
+
+        foreach (Source source in sources)
+        {
+            if (source.IsPicked)
+            {
+                NewsCardFeed newsCardFeed = new NewsCardFeed(source.Link, source.Title);
+                text += source.Link + ": " + newsCardFeed.Items.Count + " // ";
+                cards.AddRange(newsCardFeed.Items);
+            }
+        }
+
+        cards.Sort((x, y) => DateTime.Compare(y.Date, x.Date));
+    }
+
+    protected override void OnInitialized()
+    {
+        GetSources();
+    }
+}

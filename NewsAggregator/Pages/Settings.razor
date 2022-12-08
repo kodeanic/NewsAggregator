@@ -1,0 +1,83 @@
+﻿@page "/settings"
+@using NewsAggregator.Data
+@using Microsoft.Data.Sqlite
+
+<PageTitle>Настроки ленты</PageTitle>
+
+<h3>Настроки ленты</h3>
+
+Поставьте галочку, чтобы показывать ресурс:
+
+@foreach (Source source in sources)
+{
+        <ul>
+            <li>
+            @source.Title
+                <input type="checkbox" checked="@source.IsPicked" @onchange="@(() => { changePicked(source); } )"/>
+            @source.IsPicked
+            @source.Link
+            </li>
+        </ul>
+}
+
+
+@code {
+    List<Source> sources = new List<Source>();
+
+    public void ShowSources()
+    {
+        sources.Clear();
+        using (var connection = new SqliteConnection("Data Source=sourcesdata.db"))
+        {
+            connection.Open();
+
+            string sqlExpression = "SELECT * FROM Sources";
+            SqliteCommand command = new SqliteCommand(sqlExpression, connection);
+            using (SqliteDataReader reader = command.ExecuteReader())
+            {
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        string title = reader.GetString(1);
+                        bool isPicked = reader.GetInt32(2) == 1 ? true : false;
+                        string link = reader.GetString(3);
+
+                        sources.Add(new Source(title, isPicked, link));
+                    }
+                }
+            }
+
+            connection.Close();
+        }
+    }
+
+    public void changePicked(Source source)
+    {
+        using (var connection = new SqliteConnection("Data Source=sourcesdata.db"))
+        {
+            connection.Open();
+
+            int isPicked;
+            if (source.IsPicked)
+            {
+                isPicked = 0;
+            }
+            else
+            {
+                isPicked = 1;
+            }
+            string sqlExpression = "UPDATE Sources SET IsPicked=" + isPicked + " WHERE Title='" + source.Title + "'";
+            SqliteCommand command = new SqliteCommand(sqlExpression, connection);
+            command.ExecuteNonQuery();
+
+            connection.Close();
+        }
+        ShowSources();
+    }
+
+    protected override void OnInitialized()
+    {
+        ShowSources();
+    }
+}
