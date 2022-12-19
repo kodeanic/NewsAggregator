@@ -1,6 +1,7 @@
 ﻿using System.Xml;
 using System.Text;
 using System.ServiceModel.Syndication;
+using System.Text.RegularExpressions;
 
 namespace NewsAggregator.Data
 {
@@ -20,6 +21,10 @@ namespace NewsAggregator.Data
             {
                 string title = item.Title.Text;
                 string description = item.Summary.Text;
+
+                var reg = new Regex("<.*?>");
+                description = reg.Replace(description, "");
+
                 string link = item.Links[0].Uri.ToString();
                 DateTime date = item.PublishDate.DateTime;
                 Items.Add(new NewsCard(title, description, link, source, date));

@@ -4,18 +4,14 @@
 
 <PageTitle>Настроки ленты</PageTitle>
 
-<h3>Настроки ленты</h3>
-
-Поставьте галочку, чтобы показывать ресурс:
+<h3>Поставьте галочку, чтобы показывать ресурс:</h3>
 
 @foreach (Source source in sources)
 {
         <ul>
             <li>
             @source.Title
-                <input type="checkbox" checked="@source.IsPicked" @onchange="@(() => { changePicked(source); } )"/>
-            @source.IsPicked
-            @source.Link
+            <input type="checkbox" checked="@source.IsPicked" @onchange="@(() => { changePicked(source); } )"/>
             </li>
         </ul>
 }

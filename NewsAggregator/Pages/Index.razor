@@ -4,23 +4,21 @@
 
 <PageTitle>Новости</PageTitle>
 
-<h1>Агрегатор новостей</h1>
+<h3>Мои новости</h3>
 
-На этом сайте можно следить за последними новостями!
-<p>//</p>
-<p>Информация о выводе: @text</p>
-<p>//</p>
 <div class="container">
     <div class="text-left my-1">
         <ul class="list-group">
             @foreach (NewsCard card in cards)
             {
-                    <li class="list-group-item">
-                        <h5><a href="@card.Link" target="_blank">@card.Title</a></h5>
-                        <p>Description: @card.Description</p>
-                        <p>Source: @card.Source</p>
-                        <p>Publish date: @card.Date.ToString("dd-MM-yyyy hh:mm")</p>
-                    </li>
+                <li class="list-group-item">
+                    <h5><a href="@card.Link" target="_blank">@card.Title</a></h5>
+                    <p>Описание: @card.Description</p>
+                    <div class="div_footer">
+                        <span>Источник: @card.Source</span>
+                        <span>Дата публикации: @card.Date.ToString("dd-MM-yyyy hh:mm")</span>
+                    </div>
+                </li>
             }
         </ul>
     </div>
