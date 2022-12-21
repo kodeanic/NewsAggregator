@@ -3,21 +3,19 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Data.Sqlite;
 
-/*
-using (var connection = new SqliteConnection("Data Source=sourcesdata.db"))
+
+using (var db = new ApplicationContext())
 {
-    connection.Open();
-    
-    SqliteCommand command = new SqliteCommand();
-    command.Connection = connection;
-    command.CommandText = "CREATE TABLE Sources (_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, Title TEXT NOT NULL, IsPicked INTEGER NOT NULL, Link TEXT NOT NULL)";
-    command.ExecuteNonQuery();
-    command.CommandText = "INSERT INTO Sources (Title, IsPicked, Link) VALUES ('Кинопоиск', 1, 'https://www.kinopoisk.ru/news.rss'), ('FILMZ.RU', 1, 'http://www.filmz.ru/rss/files/news7.xml'), ('Кинокадр', 1, 'http://www.kinokadr.ru/export/rss.xml')";
-    command.ExecuteNonQuery();
-    
-    connection.Close();
+    if (db.Sources.Count() == 0)
+    {
+        db.Sources.Add(new Source { Title = "Кинопоиск", Link = "https://www.kinopoisk.ru/news.rss" });
+        db.Sources.Add(new Source { Title = "FILMZ.RU", Link = "http://www.filmz.ru/rss/files/news7.xml" });
+        db.Sources.Add(new Source { Title = "Кинокадр", Link = "http://www.kinokadr.ru/export/rss.xml" });
+
+        db.SaveChanges();
+    }
 }
-*/
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

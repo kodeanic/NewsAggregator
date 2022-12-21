@@ -2,14 +2,9 @@
 {
     public class Source
     {
+        public int Id { get; set; }
         public string Title { get; set; }
-        public bool IsPicked { get; set; }
+        public bool IsPicked { get; set; } = true;
         public string Link { get; set; }
-        public Source(string title, bool isPicked, string link)
-        {
-            Title = title;
-            IsPicked = isPicked;
-            Link = link;
-        }
     }
 }

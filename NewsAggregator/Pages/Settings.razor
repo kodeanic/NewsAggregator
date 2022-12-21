@@ -6,14 +6,14 @@
 
 <h3>Поставьте галочку, чтобы показывать ресурс:</h3>
 
-@foreach (Source source in sources)
+@foreach (var source in sources)
 {
-        <ul>
-            <li>
-            @source.Title
-            <input type="checkbox" checked="@source.IsPicked" @onchange="@(() => { changePicked(source); } )"/>
-            </li>
-        </ul>
+    <ul>
+        <li>
+        @source.Title
+        <input type="checkbox" checked="@source.IsPicked" @onchange="@(() => { changePicked(source); } )"/>
+        </li>
+    </ul>
 }
 
 
@@ -23,51 +23,26 @@
     public void ShowSources()
     {
         sources.Clear();
-        using (var connection = new SqliteConnection("Data Source=sourcesdata.db"))
+
+        using (var db = new ApplicationContext())
         {
-            connection.Open();
-
-            string sqlExpression = "SELECT * FROM Sources";
-            SqliteCommand command = new SqliteCommand(sqlExpression, connection);
-            using (SqliteDataReader reader = command.ExecuteReader())
-            {
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        string title = reader.GetString(1);
-                        bool isPicked = reader.GetInt32(2) == 1 ? true : false;
-                        string link = reader.GetString(3);
-
-                        sources.Add(new Source(title, isPicked, link));
-                    }
-                }
-            }
-
-            connection.Close();
+            sources = db.Sources.ToList();
         }
     }
 
     public void changePicked(Source source)
     {
-        using (var connection = new SqliteConnection("Data Source=sourcesdata.db"))
+        using (var db = new ApplicationContext())
         {
-            connection.Open();
-
-            int isPicked;
-            if (source.IsPicked)
+            foreach (var s in sources)
             {
-                isPicked = 0;
+                if (s.Id == source.Id)
+                {
+                    s.IsPicked = !source.IsPicked;
+                    db.Sources.Update(s);
+                    db.SaveChanges();
+                }
             }
-            else
-            {
-                isPicked = 1;
-            }
-            string sqlExpression = "UPDATE Sources SET IsPicked=" + isPicked + " WHERE Title='" + source.Title + "'";
-            SqliteCommand command = new SqliteCommand(sqlExpression, connection);
-            command.ExecuteNonQuery();
-
-            connection.Close();
         }
         ShowSources();
     }
